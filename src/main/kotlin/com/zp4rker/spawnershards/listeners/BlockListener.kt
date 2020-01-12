@@ -12,15 +12,16 @@ class BlockListener : Listener {
 
     @EventHandler
     fun onBlockPlace(event: BlockPlaceEvent) {
-        if (event.blockPlaced.type != Material.MOB_SPAWNER || event.itemInHand.type != Material.MOB_SPAWNER) return
+        if (event.block.state !is CreatureSpawner || event.itemInHand.type != Material.MOB_SPAWNER) return
 
         val meta = if (event.itemInHand.hasItemMeta()) event.itemInHand.itemMeta else return
         if (!meta.hasLore() || !meta.lore[0].contains("Mob type:")) return
 
-        val type = ChatColor.stripColor(meta.lore[0]).substring(9).let { EntityType.valueOf(it.toUpperCase()) }
+        val type = ChatColor.stripColor(meta.lore[0]).substring(10).let { EntityType.valueOf(it.toUpperCase()) }
         val spawner = event.block.state as CreatureSpawner
 
         spawner.spawnedType = type
+        spawner.update(true)
     }
 
 }
