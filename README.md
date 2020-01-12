@@ -1,0 +1,2 @@
+# spawnershards
+ Simple spawner shards.
