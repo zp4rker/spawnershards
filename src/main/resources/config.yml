@@ -1,0 +1,5 @@
+lore-prefix: "&6Mob type:"
+
+shard-item:
+  name: "Spawner Shard"
+  type: PRISMARINE_SHARD
