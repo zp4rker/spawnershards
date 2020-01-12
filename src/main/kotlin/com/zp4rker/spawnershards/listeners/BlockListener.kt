@@ -15,8 +15,8 @@ class BlockListener(private val plugin: SpawnerShards) : Listener {
     fun onBlockPlace(event: BlockPlaceEvent) {
         if (event.block.state !is CreatureSpawner || event.itemInHand.type != Material.MOB_SPAWNER) return
 
-        if (plugin.isCustomShard(event.itemInHand)) return
-        val meta = event.itemInHand.itemMeta
+        val meta = if (event.itemInHand.hasItemMeta()) event.itemInHand.itemMeta else return
+        if (!meta.hasLore() || !meta.lore[0].contains(ChatColor.translateAlternateColorCodes('&', plugin.config.getString("lore-prefix", "Mob type:")))) return
 
         val type = ChatColor.stripColor(meta.lore[0]).substring(10).let { EntityType.valueOf(it.toUpperCase()) }
         val spawner = event.block.state as CreatureSpawner

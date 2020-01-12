@@ -1,6 +1,6 @@
 main: com.zp4rker.spawnershards.SpawnerShards
 
 name: SpawnerShards
-version: 1${project.version}
+version: ${project.version}
 author: zp4rker
 description: Simple spawner shards.
