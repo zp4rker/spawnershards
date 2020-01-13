@@ -13,14 +13,13 @@ class CraftingListener : Listener {
 
     @EventHandler
     fun onPrepareCraft(event: PrepareItemCraftEvent) {
-        if (event.recipe == null || event.recipe.result.type != Material.MOB_SPAWNER) return
-
-        if (!event.inventory.matrix.all(SpawnerShards.config::isCustomShard)) {
+        if (event.inventory.matrix.any { it == null }) return
+        if (!event.inventory.matrix.all(SpawnerShards.config::isCustomShard) || !event.inventory.matrix.all { it == event.inventory.matrix[0] }) {
             event.inventory.result = ItemStack(Material.AIR)
             return
         }
 
-        val type = EntityType.valueOf(ChatColor.stripColor(event.inventory.matrix.first().itemMeta.lore[0]).substring(10).toUpperCase())
+        val type = EntityType.valueOf(ChatColor.stripColor(event.inventory.matrix[0].itemMeta.lore[0]).substring(10).toUpperCase())
         event.inventory.result = SpawnerShards.config.getSpawner(type)
     }
 

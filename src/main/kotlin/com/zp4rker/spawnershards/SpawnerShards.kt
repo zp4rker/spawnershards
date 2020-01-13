@@ -3,12 +3,11 @@ package com.zp4rker.spawnershards
 import com.zp4rker.bukkitutils.KotlinRuntime
 import com.zp4rker.spawnershards.listeners.BlockListener
 import com.zp4rker.spawnershards.listeners.CraftingListener
+import com.zp4rker.spawnershards.listeners.MobListener
 import org.bukkit.ChatColor
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.entity.EntityType
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.ShapelessRecipe
 import org.bukkit.plugin.java.JavaPlugin
 
 class SpawnerShards : JavaPlugin() {
@@ -24,22 +23,16 @@ class SpawnerShards : JavaPlugin() {
 
         SpawnerShards.config = Config(this)
 
-        arrayOf(BlockListener(this), CraftingListener()).forEach { server.pluginManager.registerEvents(it, this) }
+        arrayOf(BlockListener(this), CraftingListener(), MobListener()).forEach { server.pluginManager.registerEvents(it, this) }
 
         saveDefaultConfig()
-
-        server.addRecipe(ShapelessRecipe(NamespacedKey(this, "shardedspawner"), ItemStack(Material.MOB_SPAWNER)).apply {
-            addIngredient(9, Material.PRISMARINE_SHARD)
-        })
-
-        server.onlinePlayers.forEach {
-            it.inventory.addItem(SpawnerShards.config.getShard(EntityType.SHEEP).apply { amount = 9 })
-        }
     }
 
     class Config(private val plugin: JavaPlugin) {
         fun isCustomShard(shard: ItemStack): Boolean {
-            return with(shard.itemMeta) { hasLore() && lore[0].contains(ChatColor.translateAlternateColorCodes('&', plugin.config.getString("lore-prefix", "Mob type:"))) }
+            if (shard.type != Material.matchMaterial(plugin.config.getString("shard-item.type", "PRISMARINE_SHARD"))) return false
+            if (!shard.hasItemMeta() || !shard.itemMeta.hasLore()) return false
+            return shard.itemMeta.lore[0].contains(ChatColor.translateAlternateColorCodes('&', plugin.config.getString("lore-prefix", "Mob type:")))
         }
 
         fun getShard(type: EntityType): ItemStack {
