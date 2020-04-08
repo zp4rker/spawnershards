@@ -1,5 +1,6 @@
 package com.zp4rker.spawnershards
 
+import com.joeyoey.spacestacker.SpaceStacker
 import com.zp4rker.bukkitutils.KotlinRuntime
 import com.zp4rker.spawnershards.listeners.BlockListener
 import com.zp4rker.spawnershards.listeners.CraftingListener
@@ -44,10 +45,31 @@ class SpawnerShards : JavaPlugin() {
             }
         }
 
-        fun getSpawner(type: EntityType): ItemStack {
+        /*fun getSpawner(type: EntityType): ItemStack {
             return ItemStack(Material.MOB_SPAWNER).apply {
                 itemMeta = itemMeta.apply {
                     lore = listOf(ChatColor.translateAlternateColorCodes('&', "${plugin.config.getString("lore-prefix", "Mob type:")} ${type.name.toLowerCase().capitalize()}"))
+                }
+            }
+        }*/
+
+        fun getSpawner(type: EntityType): ItemStack {
+            val spaceStacker = plugin.server.pluginManager.getPlugin("SpaceStacker") as SpaceStacker
+
+            return ItemStack(Material.MOB_SPAWNER).apply {
+                itemMeta = itemMeta.apply {
+                    val name = spaceStacker.config.getString("formats.tier-spawner.name")
+                    val lore = spaceStacker.config.getStringList("formats.tier-spawner.lore")
+                    val entityName = type.name.split("_").joinToString("") { it.toLowerCase().capitalize() }
+
+                    displayName = ChatColor.translateAlternateColorCodes('&', name.replace("%entity%", entityName))
+                    this.lore = lore.map {
+                        ChatColor.translateAlternateColorCodes('&', with(it) {
+                            replace("%upgrade%", "DEFAULT")
+                            replace("%amount%", "1")
+                            replace("%entity%", entityName)
+                        })
+                    }
                 }
             }
         }
